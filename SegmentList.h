@@ -13,6 +13,7 @@ class SegmentList {
 		int getColumn();
 		int numOfSegments();
 		Segment& getSegment(int);
+		bool mustBeFilled(int);
 	private:
 		QVector<Segment> line;
 		int row;

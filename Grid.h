@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QVector>
+#include <QHash>
+#include <QPair>
 #include <QLineEdit>
 #include "PicmaBox.h"
 #include "SegmentList.h"
@@ -13,7 +15,9 @@ class Grid {
 		void setStateAt(int, int, boxState);
 	private:
 		QVector<QVector<PicmaBox>> *board;
-		QVector<SegmentList> lineSegments;
+		QHash<QPair<int,int>, SegmentList> lineSegments;
 		
 		void checkPossibleSpanIntersections();
+		void checkForCompleteSegments();
+		void fillClosedBoxes();
 };

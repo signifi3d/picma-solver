@@ -51,3 +51,12 @@ Segment& SegmentList::getSegment(int segmentIndex) {
 int SegmentList::numOfSegments() {
 	return line.size();
 }
+
+bool SegmentList::mustBeFilled(int position) {
+	for (int i = 0; i < line.size(); ++i) {
+		if ( line[i].allPossibleSpansIntersectAt(position) ) {
+			return true;
+		}
+	}
+	return false;
+}
