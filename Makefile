@@ -380,7 +380,8 @@ Grid.o: Grid.cpp Grid.h \
 		PicmaBox.h \
 		SegmentList.h \
 		Segment.h \
-		Span.h
+		Span.h \
+		LineState.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Grid.o Grid.cpp
 
 GridUI.o: GridUI.cpp GridUI.h \
@@ -388,7 +389,8 @@ GridUI.o: GridUI.cpp GridUI.h \
 		PicmaBox.h \
 		SegmentList.h \
 		Segment.h \
-		Span.h
+		Span.h \
+		LineState.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o GridUI.o GridUI.cpp
 
 main.o: main.cpp GridUI.h \
@@ -396,7 +398,8 @@ main.o: main.cpp GridUI.h \
 		PicmaBox.h \
 		SegmentList.h \
 		Segment.h \
-		Span.h
+		Span.h \
+		LineState.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 Segment.o: Segment.cpp Segment.h \
@@ -405,7 +408,8 @@ Segment.o: Segment.cpp Segment.h \
 
 SegmentList.o: SegmentList.cpp SegmentList.h \
 		Segment.h \
-		Span.h
+		Span.h \
+		LineState.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o SegmentList.o SegmentList.cpp
 
 Span.o: Span.cpp Span.h

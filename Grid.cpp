@@ -1,6 +1,7 @@
 #include "Grid.h"
 #include "PicmaBox.h"
 #include "SegmentList.h"
+#include "LineState.h"
 #include <QVector>
 #include <QLineEdit>
 #include <QHash>
@@ -39,7 +40,36 @@ void Grid::solve() {
 }
 
 void Grid::checkForCompleteSegments() {
-	
+	for (int x = 0; x < board->size(); ++x) {
+		LineState currentLineState;
+		Span filledBoxSpan(-1,-1);
+		for (int y = 0; y < board->size(); ++y) {
+			if ( boxStateAt(x,y) == FILLED && filledBoxSpan.getLowerBound() == -1 ) {
+				filledBoxSpan.setLowerBound(y);
+			} else if ( boxStateAt(x,y) != FILLED && filledBoxSpan.getLowerBound() != -1 ) {
+				filledBoxSpan.setUpperBound(y-1);
+				currentLineState.addSpan(filledBoxSpan);
+				filledBoxSpan.setLowerBound(-1);
+				filledBoxSpan.setUpperBound(-1);
+			}
+		}
+		lineSegments[QPair<int,int>(x,0)].compareWithLineState(currentLineState);
+	}
+	for (int y = 0; y < board->size(); ++y) {
+		LineState currentLineState;
+		Span filledBoxSpan(-1,-1);
+		for (int x = 0; x < board->size(); ++x) {
+			if ( boxStateAt(x,y) == FILLED && filledBoxSpan.getLowerBound() == -1) {
+				filledBoxSpan.setLowerBound(x);
+			} else if (boxStateAt(x,y) != FILLED && filledBoxSpan.getLowerBound() != -1 ) {
+				filledBoxSpan.setUpperBound(x-1);
+				currentLineState.addSpan(filledBoxSpan);
+				filledBoxSpan.setLowerBound(-1);
+				filledBoxSpan.setUpperBound(-1);
+			}
+		}
+		lineSegments[QPair<int,int>(0,y)].compareWithLineState(currentLineState);
+	}
 }
 
 void Grid::fillClosedBoxes() {

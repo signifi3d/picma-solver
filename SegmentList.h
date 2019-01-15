@@ -3,6 +3,7 @@
 #include <QVector>
 #include <QString>
 #include "Segment.h"
+#include "LineState.h"
 
 class SegmentList {
 	public:
@@ -14,6 +15,8 @@ class SegmentList {
 		int numOfSegments();
 		Segment& getSegment(int);
 		bool mustBeFilled(int);
+		void compareWithLineState(LineState);
+		bool isLargestUniqueSegment(int);
 	private:
 		QVector<Segment> line;
 		int row;

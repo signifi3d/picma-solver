@@ -31,8 +31,10 @@ bool Segment::isComplete() {
 	return complete;
 }
 
-void Segment::setComplete() {
+void Segment::setComplete(Span completeSpan) {
 	complete = !complete;
+	removeAllPossibleSpansWithout(completeSpan.getLowerBound());
+	removeAllPossibleSpansWithout(completeSpan.getUpperBound());
 }
 
 bool Segment::allPossibleSpansIntersectAt( int gridPoint ) {

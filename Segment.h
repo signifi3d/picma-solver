@@ -12,7 +12,7 @@ class Segment {
 		bool allPossibleSpansIntersectAt(int);
 		void removePossibleSpansWithout(int);
 		bool isComplete();
-		void setComplete();
+		void setComplete(Span);
 	private:
 		QVector<Span> possibleSpans;
 		int size;
