@@ -31,9 +31,7 @@ SegmentList::SegmentList(int x, int y, int inSize, QString inputString) {
 
 void SegmentList::printSegments() {
 	for (int i = 0; i < line.size(); i++) {
-		std::cout << line[i].getSize() << " ";
 	}
-	std::cout << std::endl;
 }
 
 int SegmentList::getRow() {
@@ -69,12 +67,24 @@ void SegmentList::compareWithLineState(LineState currentState) {
 		if ( line[i].isComplete() ) continue;
 		for (int j = latestPairedState; j < currentState.numOfSpans(); ++j) {
 			if ( currentState.getBoxSpanNum(j).getLowerBound() < currLowestBound ) continue;
-			if ( !line[i].allPossibleSpansIntersectAt(currentState.getBoxSpanNum(j).getUpperBound()) ) {
+			if ( line[i].getHighestPossibleBound() < currentState.getBoxSpanNum(j).getUpperBound() ) {
 				currLowestBound += line[i].getSize()+1;
 				break;
 			}
-			if ( currentState.getBoxSpanNum(j).range() == line[i].getSize() ) {
-				if ( currentState.getBoxSpanNum(j).getLowerBound() - currLowestBound < line[i].getSize() + 1 || isLargestUniqueSegment(i) ) {
+			if ( currentState.getBoxSpanNum(j).range()+1 == line[i].getSize() ) {
+				if ( currentState.getBoxSpanNum(j).getLowerBound() - currLowestBound < line[i].getSize() + 1 && i == 0 ) {
+					line[i].setComplete(currentState.getBoxSpanNum(j));
+					currLowestBound = currentState.getBoxSpanNum(j).getUpperBound()+1;
+					latestPairedState = j;
+					break;
+				}
+				if ( line[i].getHighestPossibleBound() - line[i].getLowestPossibleBound() + 1 - line[i].getSize() < line[i].getSize()) {
+					line[i].setComplete(currentState.getBoxSpanNum(j));
+					currLowestBound = currentState.getBoxSpanNum(j).getUpperBound()+1;
+					latestPairedState = j;
+					break;
+				}
+				if ( isLargestUniqueSegment(i) ) {
 					line[i].setComplete(currentState.getBoxSpanNum(j));
 					currLowestBound = currentState.getBoxSpanNum(j).getUpperBound()+1;
 					latestPairedState = j;
@@ -86,9 +96,9 @@ void SegmentList::compareWithLineState(LineState currentState) {
 }
 
 bool SegmentList::isLargestUniqueSegment(int segmentIndex) {
-	if ( size - line[segmentIndex].getSize() > size / 2 ) return true;
+	if ( size - line[segmentIndex].getSize() < size / 2 ) return true;
 	for (int i = 0; i < line.size(); ++i) {
-		if ( line[i].getSize() > line[segmentIndex].getSize() || (line[i].getSize() == line[segmentIndex].getSize() && i != segmentIndex) ) return false;
+		if (!line[i].isComplete() && (line[i].getSize() > line[segmentIndex].getSize() || (line[i].getSize() == line[segmentIndex].getSize() && i != segmentIndex)) ) return false;
 	}
 	return true;
 }

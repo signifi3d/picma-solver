@@ -52,12 +52,14 @@ OBJECTS_DIR   = ./
 
 SOURCES       = Grid.cpp \
 		GridUI.cpp \
+		LineState.cpp \
 		main.cpp \
 		Segment.cpp \
 		SegmentList.cpp \
 		Span.cpp 
 OBJECTS       = Grid.o \
 		GridUI.o \
+		LineState.o \
 		main.o \
 		Segment.o \
 		SegmentList.o \
@@ -137,11 +139,13 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
 		picma-solver.pro Grid.h \
 		GridUI.h \
+		LineState.h \
 		PicmaBox.h \
 		Segment.h \
 		SegmentList.h \
 		Span.h Grid.cpp \
 		GridUI.cpp \
+		LineState.cpp \
 		main.cpp \
 		Segment.cpp \
 		SegmentList.cpp \
@@ -327,8 +331,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents Grid.h GridUI.h PicmaBox.h Segment.h SegmentList.h Span.h $(DISTDIR)/
-	$(COPY_FILE) --parents Grid.cpp GridUI.cpp main.cpp Segment.cpp SegmentList.cpp Span.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents Grid.h GridUI.h LineState.h PicmaBox.h Segment.h SegmentList.h Span.h $(DISTDIR)/
+	$(COPY_FILE) --parents Grid.cpp GridUI.cpp LineState.cpp main.cpp Segment.cpp SegmentList.cpp Span.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -392,6 +396,10 @@ GridUI.o: GridUI.cpp GridUI.h \
 		Span.h \
 		LineState.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o GridUI.o GridUI.cpp
+
+LineState.o: LineState.cpp LineState.h \
+		Span.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o LineState.o LineState.cpp
 
 main.o: main.cpp GridUI.h \
 		Grid.h \

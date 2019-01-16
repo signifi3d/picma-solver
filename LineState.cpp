@@ -5,13 +5,13 @@
 LineState::LineState() {}
 
 void LineState::addSpan(Span inSpan) {
-	filledBoxes.insert(inSpan);
+	filledBoxes.append(inSpan);
 }
 
 int LineState::numOfSpans() {
 	return filledBoxes.size();
 }
 
-Span getBoxSpanNum(int index) {
+Span LineState::getBoxSpanNum(int index) {
 	return filledBoxes[index];
 }

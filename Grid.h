@@ -20,4 +20,6 @@ class Grid {
 		void checkPossibleSpanIntersections();
 		void checkForCompleteSegments();
 		void fillClosedBoxes();
+		
+		void debugBoardPrint();
 };

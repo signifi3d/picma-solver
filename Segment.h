@@ -11,8 +11,11 @@ class Segment {
 		int getSize();
 		bool allPossibleSpansIntersectAt(int);
 		void removePossibleSpansWithout(int);
+		void removePossibleSpansWith(int);
 		bool isComplete();
 		void setComplete(Span);
+		int getLowestPossibleBound();
+		int getHighestPossibleBound();
 	private:
 		QVector<Span> possibleSpans;
 		int size;

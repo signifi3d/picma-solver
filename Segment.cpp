@@ -32,9 +32,13 @@ bool Segment::isComplete() {
 }
 
 void Segment::setComplete(Span completeSpan) {
-	complete = !complete;
-	removeAllPossibleSpansWithout(completeSpan.getLowerBound());
-	removeAllPossibleSpansWithout(completeSpan.getUpperBound());
+	complete = true;
+	for (int i = 0; i < possibleSpans.size(); ++i) {
+		if ( possibleSpans[i].getLowerBound() < completeSpan.getLowerBound() || possibleSpans[i].getUpperBound() > completeSpan.getUpperBound() ) {
+			possibleSpans.remove(i); 
+			--i;
+		}
+	}
 }
 
 bool Segment::allPossibleSpansIntersectAt( int gridPoint ) {
@@ -52,8 +56,37 @@ void Segment::removePossibleSpansWithout( int gridPoint ) {
 	for (int i = 0; i < possibleSpans.size(); ++i ) {
 		if ( !possibleSpans[i].spanContains(gridPoint) ) {
 			possibleSpans.remove(i);
+			--i;
 		}
 	}
 
 	return;
+}
+
+void Segment::removePossibleSpansWith( int gridPoint ) {
+	
+	for (int i = 0; i < possibleSpans.size(); ++i) {
+		if ( possibleSpans[i].spanContains(gridPoint) ) {
+			possibleSpans.remove(i);
+			--i;
+		}
+	}
+}
+
+int Segment::getLowestPossibleBound() {
+	int lowestBound = -1;
+	for (int i = 0; i < possibleSpans.size(); ++i) {
+		if ( possibleSpans[i].getLowerBound() < lowestBound || lowestBound == -1)
+			lowestBound = possibleSpans[i].getLowerBound();
+	}
+	return lowestBound;
+}
+
+int Segment::getHighestPossibleBound() {
+	int highestBound = 0;
+	for (int i = 0; i < possibleSpans.size(); ++i) {
+		if ( possibleSpans[i].getUpperBound() > highestBound )
+			highestBound = possibleSpans[i].getUpperBound();
+	}
+	return highestBound;
 }
