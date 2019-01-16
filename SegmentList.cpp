@@ -78,6 +78,10 @@ void SegmentList::compareWithLineState(LineState currentState) {
 					latestPairedState = j;
 					break;
 				}
+				if ( size - currentState.getBoxSpanNum(j).getUpperBound() < line[i].getSize() + 1 && i == line.size()-1 ) {
+					line[i].setComplete(currentState.getBoxSpanNum(j));
+					return;
+				}
 				if ( line[i].getHighestPossibleBound() - line[i].getLowestPossibleBound() + 1 - line[i].getSize() < line[i].getSize()) {
 					line[i].setComplete(currentState.getBoxSpanNum(j));
 					currLowestBound = currentState.getBoxSpanNum(j).getUpperBound()+1;
