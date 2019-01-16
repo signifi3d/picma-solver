@@ -129,18 +129,14 @@ void GridUI::updateGrid(Grid& newGrid) {
 			QString *boxState;
 			switch (newGrid.boxStateAt(i,j)) {
 				case OPEN:
-					boxState = new QString("?");
 					break;
 				case FILLED:
-					boxState = new QString("+");
+					picmaGrid[i+1][j+1]->setStyleSheet("QLineEdit { background-color: blue }");
 					break;
 				case CLOSED:
-					boxState = new QString("x");
+					picmaGrid[i+1][j+1]->setStyleSheet("QLineEdit { background-color: red }");
 					break;
-				default:
-					boxState = new QString(" ");
 			}
-			picmaGrid[i+1][j+1]->setText(*boxState);
 		}
 	} 
 }

@@ -33,11 +33,11 @@ void Grid::setStateAt(int x, int y, boxState newState) {
 	if ( newState == CLOSED ) {
 		SegmentList curr = lineSegments[QPair<int,int>(0, y+1)];
 		for (int i = 0; i < curr.numOfSegments(); ++i) 
-			curr.getSegment(i).isComplete() ? continue : curr.getSegment(i).removePossibleSpansWith(x);
+			if ( !curr.getSegment(i).isComplete() )  curr.getSegment(i).removePossibleSpansWith(x);
 
 		curr = lineSegments[QPair<int,int>(x+1, 0)];
 		for (int i = 0; i < curr.numOfSegments(); ++i)
-			curr.getSegment(i).isComplete() ? continue : curr.getSegment(i).removePossibleSpansWith(y);
+			if ( !curr.getSegment(i).isComplete() )  curr.getSegment(i).removePossibleSpansWith(y);
 	}
 	(*board)[x][y].currentState = newState;
 }
