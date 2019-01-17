@@ -61,20 +61,17 @@ bool SegmentList::mustBeFilled(int position) {
 
 void SegmentList::compareWithLineState(LineState currentState) {
 	if ( currentState.numOfSpans() == 0 ) return;
-	int currLowestBound = 0;
 	int latestPairedState = 0;
 	for (int i = 0; i < line.size(); ++i) {
 		if ( line[i].isComplete() ) continue;
 		for (int j = latestPairedState; j < currentState.numOfSpans(); ++j) {
-			if ( currentState.getBoxSpanNum(j).getLowerBound() < currLowestBound ) continue;
+			if ( currentState.getBoxSpanNum(j).getLowerBound() < line[i].getLowestPossibleBound() ) continue;
 			if ( line[i].getHighestPossibleBound() < currentState.getBoxSpanNum(j).getUpperBound() ) {
-				currLowestBound += line[i].getSize()+1;
 				break;
 			}
 			if ( currentState.getBoxSpanNum(j).range()+1 == line[i].getSize() ) {
-				if ( currentState.getBoxSpanNum(j).getLowerBound() - currLowestBound < line[i].getSize() + 1 && i == 0 ) {
+				if ( currentState.getBoxSpanNum(j).getLowerBound() < line[i].getSize() + 1 && i == 0 ) {
 					line[i].setComplete(currentState.getBoxSpanNum(j));
-					currLowestBound = currentState.getBoxSpanNum(j).getUpperBound()+1;
 					latestPairedState = j;
 					break;
 				}
@@ -84,13 +81,11 @@ void SegmentList::compareWithLineState(LineState currentState) {
 				}
 				if ( line[i].getHighestPossibleBound() - line[i].getLowestPossibleBound() + 1 - line[i].getSize() < line[i].getSize()) {
 					line[i].setComplete(currentState.getBoxSpanNum(j));
-					currLowestBound = currentState.getBoxSpanNum(j).getUpperBound()+1;
 					latestPairedState = j;
 					break;
 				}
 				if ( isLargestUniqueSegment(i) ) {
 					line[i].setComplete(currentState.getBoxSpanNum(j));
-					currLowestBound = currentState.getBoxSpanNum(j).getUpperBound()+1;
 					latestPairedState = j;
 					break;
 				}

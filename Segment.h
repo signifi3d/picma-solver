@@ -14,6 +14,8 @@ class Segment {
 		void removePossibleSpansWith(int);
 		bool isComplete();
 		void setComplete(Span);
+		int numOfPossibleSpans();
+		Span getPossibleSpanAt(int);
 		int getLowestPossibleBound();
 		int getHighestPossibleBound();
 	private:
