@@ -15,7 +15,9 @@ class SegmentList {
 		int numOfSegments();
 		Segment& getSegment(int);
 		bool mustBeFilled(int);
+		bool hasAsAPossibility(int);
 		void compareWithLineState(LineState);
+		void seekSolePositionOwnership(int);
 		bool isLargestUniqueSegment(int);
 	private:
 		QVector<Segment> line;

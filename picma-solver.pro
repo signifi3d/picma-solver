@@ -27,3 +27,4 @@ SOURCES += Grid.cpp \
            SegmentList.cpp \
            Span.cpp
 QT += widgets
+QMAKE_CXXFLAGS += -g

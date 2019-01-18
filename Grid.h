@@ -21,6 +21,7 @@ class Grid {
 		void checkForCompleteSegments();
 		void fillClosedBoxes();
 		void checkInevitableCompletions();
+		void pairLooseFilledBoxes();
 		
 		void debugBoardPrint();
 };

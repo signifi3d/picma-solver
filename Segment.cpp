@@ -101,3 +101,9 @@ int Segment::getHighestPossibleBound() {
 	}
 	return highestBound;
 }
+
+bool Segment::noPossibleSpansContain(int position) {
+	for (int i = 0; i < possibleSpans.size(); ++i)
+		if ( possibleSpans[i].spanContains(position) ) return false;
+	return true;
+}

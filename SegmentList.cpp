@@ -59,6 +59,14 @@ bool SegmentList::mustBeFilled(int position) {
 	return false;
 }
 
+bool SegmentList::hasAsAPossibility(int position) {
+	for (int i = 0; i < line.size(); ++i) {
+		if ( !line[i].noPossibleSpansContain(position) )
+			return true;
+	}
+	return false;
+}
+
 void SegmentList::compareWithLineState(LineState currentState) {
 	if ( currentState.numOfSpans() == 0 ) return;
 	int latestPairedState = 0;
@@ -92,6 +100,22 @@ void SegmentList::compareWithLineState(LineState currentState) {
 			} 
 		}		
 	}
+}
+
+void SegmentList::seekSolePositionOwnership(int position) {
+	int positionOwnerIndex = -1;
+	for (int i = 0; i < line.size(); ++i) {
+		if ( !line[i].noPossibleSpansContain(position) ) {
+			if ( positionOwnerIndex == -1 ) {
+				positionOwnerIndex = i;
+			} else {
+				return;
+			}
+		} 
+	}
+	if ( positionOwnerIndex == -1 ) return;
+	if ( line[positionOwnerIndex].isComplete() ) return;
+	line[positionOwnerIndex].removePossibleSpansWithout(position);
 }
 
 bool SegmentList::isLargestUniqueSegment(int segmentIndex) {

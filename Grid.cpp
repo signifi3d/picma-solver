@@ -50,13 +50,39 @@ void Grid::setStateAt(int x, int y, boxState newState) {
 }
 
 void Grid::solve() {
-	for (int i = 0; i < 5; ++i) {
+	for (int i = 0; i < 10; ++i) {
+		std::cout << " spans ";
 		checkPossibleSpanIntersections();
+		std::cout << "+ completes ";
 		checkForCompleteSegments();
+		std::cout << "+ fillclosed ";
 		fillClosedBoxes();
+		std::cout << "+ inevitable ";
 		checkInevitableCompletions();
+		std::cout << "+ 2ndcompletes ";
 		checkForCompleteSegments();
+		std::cout << "+ 2ndfill ";
 		fillClosedBoxes();
+		std::cout << "+ loose ";
+		pairLooseFilledBoxes();
+		std::cout << "+ 2ndinevitable ";
+		checkInevitableCompletions();
+		std::cout << "+ 3rdcompletes ";
+		checkForCompleteSegments();
+		std::cout << "+ 3rdfill ";
+		fillClosedBoxes();
+		std::cout << "+" << std::endl;
+	}	
+}
+
+void Grid::pairLooseFilledBoxes() {
+	for (int x = 0; x < board->size(); ++x) {
+		for (int y = 0; y < board->size(); ++y) {
+			if ( boxStateAt(x,y) == FILLED ) {
+				lineSegments[QPair<int,int>(x+1,0)].seekSolePositionOwnership(y);
+				lineSegments[QPair<int,int>(0,y+1)].seekSolePositionOwnership(x);
+			}	
+		}
 	}
 }
 
@@ -131,7 +157,6 @@ void Grid::fillClosedBoxes() {
 	for (int x = 0; x < board->size(); ++x) {
 		SegmentList columnSegments = lineSegments[QPair<int,int>(x+1,0)];
 		for (int segNo = 0; segNo < columnSegments.numOfSegments(); ++segNo) {
-			if ( x == 9 ) std::cout << segNo << " " << columnSegments.getSegment(segNo).getSize() << " " << columnSegments.getSegment(segNo).isComplete() << std::endl;
 			if ( columnSegments.getSegment(segNo).isComplete() ) {
 				if ( segNo == 0 ) {
 					for (int lineSpace = 0; lineSpace < columnSegments.getSegment(segNo).getLowestPossibleBound(); ++lineSpace) {
@@ -148,7 +173,8 @@ void Grid::fillClosedBoxes() {
 					setStateAt(x, columnSegments.getSegment(segNo).getLowestPossibleBound()-1, CLOSED);
 					setStateAt(x, columnSegments.getSegment(segNo).getHighestPossibleBound()+1, CLOSED);
 				}
-				if ( columnSegments.getSegment(segNo+1).isComplete() ) {
+				if ( segNo+1 >= columnSegments.numOfSegments() ) break;
+				else if ( columnSegments.getSegment(segNo+1).isComplete() ) {
 					for (int lineSpace = columnSegments.getSegment(segNo).getHighestPossibleBound()+1; lineSpace < columnSegments.getSegment(segNo+1).getLowestPossibleBound(); ++lineSpace) {
 						setStateAt(x,lineSpace,CLOSED);
 					}
@@ -180,6 +206,14 @@ void Grid::fillClosedBoxes() {
 						setStateAt(lineSpace,y,CLOSED);
 					}
 				}
+			}
+		}
+	}
+	for (int x = 0; x < board->size(); ++x) {
+		for (int y = 0; y < board->size(); ++y) {
+			if ( boxStateAt(x,y) == OPEN ) {
+				if ( !lineSegments[QPair<int,int>(x+1,0)].hasAsAPossibility(y) || !lineSegments[QPair<int,int>(0,y+1)].hasAsAPossibility(x) )
+					setStateAt(x,y,CLOSED); 
 			}
 		}
 	}
