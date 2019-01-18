@@ -16,14 +16,8 @@ Segment::Segment(int segmentSize, int lineSize, int smallestSegmentBeginning, in
 	size = segmentSize;
 	complete = false;
 
-	for (int i = 0; i <= possibleRange.range()-segmentSize; ++i) {
+	for (int i = 0; i <= possibleRange.range()-segmentSize; ++i) 
 		possibleSpans.append(Span(i+smallestSegmentBeginning, ((i+smallestSegmentBeginning)+segmentSize)-1));
-		/*
-		for ( int j = smallestSegmentBeginning+i; j < (possibleRange.getLowerBound()+i)+(possibleRange.range()/segmentSize); ++j ) {
-			possibleSpans.append(Span(j, (j+segmentSize)-1));
-		}
-		*/
-	}
 }
 
 int Segment::getSize() {

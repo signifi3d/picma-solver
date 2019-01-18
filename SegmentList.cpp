@@ -67,6 +67,17 @@ bool SegmentList::hasAsAPossibility(int position) {
 	return false;
 }
 
+void SegmentList::setSegmentAsComplete(int segNo, Span completionSpan) {
+	for (int i = 0; i < line.size(); ++i) {
+		if ( i == segNo ) 
+			line[i].setComplete(completionSpan);
+		else {
+			for (int j = completionSpan.getLowerBound(); j <= completionSpan.getUpperBound(); ++j)
+				line[i].removePossibleSpansWith(j);
+		}
+	}
+}
+
 void SegmentList::compareWithLineState(LineState currentState) {
 	if ( currentState.numOfSpans() == 0 ) return;
 	int latestPairedState = 0;
@@ -79,21 +90,27 @@ void SegmentList::compareWithLineState(LineState currentState) {
 			}
 			if ( currentState.getBoxSpanNum(j).range()+1 == line[i].getSize() ) {
 				if ( currentState.getBoxSpanNum(j).getLowerBound() < line[i].getSize() + 1 && i == 0 ) {
-					line[i].setComplete(currentState.getBoxSpanNum(j));
+					setSegmentAsComplete(i, currentState.getBoxSpanNum(j));
 					latestPairedState = j;
 					break;
 				}
 				if ( size - currentState.getBoxSpanNum(j).getUpperBound() < line[i].getSize() + 1 && i == line.size()-1 ) {
-					line[i].setComplete(currentState.getBoxSpanNum(j));
+					setSegmentAsComplete(i, currentState.getBoxSpanNum(j));
 					return;
 				}
 				if ( line[i].getHighestPossibleBound() - line[i].getLowestPossibleBound() + 1 - line[i].getSize() < line[i].getSize()) {
-					line[i].setComplete(currentState.getBoxSpanNum(j));
+					setSegmentAsComplete(i, currentState.getBoxSpanNum(j));
 					latestPairedState = j;
 					break;
 				}
+				if ( i != 0 ) {
+					if ( line[i].getLowestPossibleBound() == currentState.getBoxSpanNum(j).getLowerBound() && line[i-1].isComplete() ) {
+						setSegmentAsComplete(i, currentState.getBoxSpanNum(j));
+						break;
+					}
+				}
 				if ( isLargestUniqueSegment(i) ) {
-					line[i].setComplete(currentState.getBoxSpanNum(j));
+					setSegmentAsComplete(i, currentState.getBoxSpanNum(j));
 					latestPairedState = j;
 					break;
 				}

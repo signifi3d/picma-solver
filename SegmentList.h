@@ -16,6 +16,7 @@ class SegmentList {
 		Segment& getSegment(int);
 		bool mustBeFilled(int);
 		bool hasAsAPossibility(int);
+		void setSegmentAsComplete(int,Span);
 		void compareWithLineState(LineState);
 		void seekSolePositionOwnership(int);
 		bool isLargestUniqueSegment(int);

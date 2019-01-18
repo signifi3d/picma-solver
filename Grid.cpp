@@ -18,11 +18,6 @@ Grid::Grid(int size, QVector<QVector<QLineEdit*>> &inputGrid) {
 	for (int i = 1; i < size; i++) {
 		lineSegments.insert(QPair<int,int>(i,0), SegmentList(0, i-1, size-1, inputGrid[i][0]->text()));
 	}
-	/*DEBUG
-	for (int i = 0; i < lineSegments.size(); i++) {
-		lineSegments[i].printSegments();
-	}
-	*/
 } 
 
 boxState Grid::boxStateAt(int x, int y) {
@@ -50,8 +45,8 @@ void Grid::setStateAt(int x, int y, boxState newState) {
 }
 
 void Grid::solve() {
-	for (int i = 0; i < 10; ++i) {
-		std::cout << " spans ";
+	for (int i = 0; i < 100; ++i) {
+		std::cout << i << " spans ";
 		checkPossibleSpanIntersections();
 		std::cout << "+ completes ";
 		checkForCompleteSegments();
@@ -72,7 +67,24 @@ void Grid::solve() {
 		std::cout << "+ 3rdfill ";
 		fillClosedBoxes();
 		std::cout << "+" << std::endl;
+		
+		if ( puzzleSolved() )
+			break;
 	}	
+	for (int x = 0; x < board->size(); ++x) {
+		SegmentList curr = lineSegments[QPair<int,int>(x+1,0)];
+		for (int i = 0; i < curr.numOfSegments(); ++i) {
+			if (!curr.getSegment(i).isComplete())
+				std::cout << x << ", 0" << std::endl;
+		}
+	}
+	for (int y = 0; y < board->size(); ++y) {
+		SegmentList curr = lineSegments[QPair<int,int>(0,y+1)];
+		for (int i = 0; i < curr.numOfSegments(); ++i) {
+			if (!curr.getSegment(i).isComplete())
+				std::cout << "0, " << y << std::endl;
+		}
+	}
 }
 
 void Grid::pairLooseFilledBoxes() {
@@ -93,7 +105,7 @@ void Grid::checkInevitableCompletions() {
 			if ( !curr->getSegment(segNo).isComplete() && curr->getSegment(segNo).numOfPossibleSpans() == 1) {
 				for (int y = curr->getSegment(segNo).getLowestPossibleBound(); y <= curr->getSegment(segNo).getHighestPossibleBound(); ++y) {
 					setStateAt(x,y,FILLED);
-					curr->getSegment(segNo).setComplete(Span(curr->getSegment(segNo).getLowestPossibleBound(),curr->getSegment(segNo).getHighestPossibleBound()));
+					curr->setSegmentAsComplete(segNo,Span(curr->getSegment(segNo).getLowestPossibleBound(),curr->getSegment(segNo).getHighestPossibleBound()));
 				}
 			}
 		}
@@ -104,7 +116,7 @@ void Grid::checkInevitableCompletions() {
 			if ( !curr->getSegment(segNo).isComplete() && curr->getSegment(segNo).numOfPossibleSpans() == 1) {
 				for (int x = curr->getSegment(segNo).getLowestPossibleBound(); x <= curr->getSegment(segNo).getHighestPossibleBound(); ++x) {
 					setStateAt(x,y,FILLED);
-					curr->getSegment(segNo).setComplete(Span(curr->getSegment(segNo).getLowestPossibleBound(),curr->getSegment(segNo).getHighestPossibleBound()));
+					curr->setSegmentAsComplete(segNo, Span(curr->getSegment(segNo).getLowestPossibleBound(),curr->getSegment(segNo).getHighestPossibleBound()));
 				}
 			}
 		}
@@ -233,6 +245,16 @@ void Grid::checkPossibleSpanIntersections() {
 			}
 		}
 	}
+}
+
+bool Grid::puzzleSolved() {
+	for (int x = 0; x < board->size(); ++x) {
+		for (int y = 0; y < board->size(); ++y) {
+			if ( boxStateAt(x,y) == OPEN )
+				return false;
+		}
+	}
+	return true;
 }
 
 void Grid::debugBoardPrint() {

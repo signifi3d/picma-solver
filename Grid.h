@@ -22,6 +22,7 @@ class Grid {
 		void fillClosedBoxes();
 		void checkInevitableCompletions();
 		void pairLooseFilledBoxes();
+		bool puzzleSolved();
 		
 		void debugBoardPrint();
 };
