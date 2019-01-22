@@ -14,6 +14,8 @@ class GridUI : public QWidget {
 	public:
 		GridUI(QWidget *parent = 0);
 	private:
+		const int minVertWidth = 7;
+
 		QGridLayout *grid;
 		QGridLayout *uiCell;
 		QGridLayout *vertInputCell;
@@ -21,6 +23,9 @@ class GridUI : public QWidget {
 		QGridLayout *puzzleGridCell;
 		QLineEdit   *dimensionInput;
 		QVector<QVector<QLineEdit*>> picmaGrid;
+
+		
+
 		void buildGrid();
 		bool solve();
 		void updateGrid(Grid&);

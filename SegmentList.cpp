@@ -4,14 +4,10 @@
 #include "SegmentList.h"
 
 SegmentList::SegmentList() {
-	row = 0;
-	column = 0;
 	size = 0;
 }
 
-SegmentList::SegmentList(int x, int y, int inSize, QVector<int> inputVector) {
-	row = x;
-	column = y;
+SegmentList::SegmentList(int inSize, QVector<int> inputVector) {
 	size = inSize;
 	for (int i = 0; i < inputVector.size(); ++i) {
 		int prevSegmentSize = 0;
@@ -28,16 +24,10 @@ SegmentList::SegmentList(int x, int y, int inSize, QVector<int> inputVector) {
 
 void SegmentList::printSegments() {
 	for (int i = 0; i < line.size(); i++) {
+		std::cout << line[i].getSize() << " ";
 	}
 }
 
-int SegmentList::getRow() {
-	return row;
-}
-
-int SegmentList::getColumn() {
-	return column;
-}
 
 Segment& SegmentList::getSegment(int segmentIndex) {
 	return line[segmentIndex];

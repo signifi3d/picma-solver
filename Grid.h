@@ -9,7 +9,7 @@
 
 class Grid {
 	public:
-		Grid(int, int, QVector<QVector<QLineEdit*>>&);
+		Grid(int, QVector<QVector<int>>&);
 		void solve();
 		boxState boxStateAt(int, int);
 		void setStateAt(int, int, boxState);

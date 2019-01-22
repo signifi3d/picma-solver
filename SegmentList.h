@@ -8,10 +8,8 @@
 class SegmentList {
 	public:
 		SegmentList();
-		SegmentList(int,int, int, QVector<int>);
+		SegmentList(int, QVector<int>);
 		void printSegments();
-		int getRow();
-		int getColumn();
 		int numOfSegments();
 		Segment& getSegment(int);
 		bool mustBeFilled(int);
@@ -22,7 +20,5 @@ class SegmentList {
 		bool isLargestUniqueSegment(int);
 	private:
 		QVector<Segment> line;
-		int row;
-		int column;
 		int size;
 };

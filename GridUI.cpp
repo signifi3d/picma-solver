@@ -52,22 +52,14 @@ void GridUI::buildGrid() {
 
 	QLayoutItem *toDelete;
 	while ((toDelete = vertInputCell->takeAt(0)) != 0) {
-		vertInputCell->removeItem(toDelete);
 		delete toDelete->widget();
 	}
 	while ((toDelete = horInputCell->takeAt(0)) != 0) {
-		horInputCell->removeItem(toDelete);
 		delete toDelete->widget();
 	}
 	while ((toDelete = puzzleGridCell->takeAt(0)) != 0) {
-		puzzleGridCell->removeItem(toDelete);
 		delete toDelete->widget();
 	}
-
-	horInputCell->invalidate();
-	vertInputCell->invalidate();
-	puzzleGridCell->invalidate();
-	grid->invalidate();
 
 	for (int inCol = 0; inCol < gridDimension; ++inCol) {
 		for (int inBox = 0; inBox < inputGridOffset; ++inBox) {
@@ -80,7 +72,7 @@ void GridUI::buildGrid() {
 	}
 	
 	for (int inRow = 0; inRow < gridDimension; ++inRow) {
-		for (int inBox = 0; inBox < inputGridOffset; ++inBox) {
+		for (int inBox = 0; inBox < inputGridOffset ; ++inBox) {
 			QLineEdit *temp = new QLineEdit(" ", this);
 			temp->setFixedWidth(20);
 			vertInputCell->addWidget(temp, inBox, inRow);
@@ -97,12 +89,41 @@ void GridUI::buildGrid() {
 			puzzBox->show();
 		}
 	}
+
+	resize(0,0);
 	return;
 }
 
 bool GridUI::solve() {
+
+	QVector<QVector<int>> segmentInputs;
+	
+	for (int col = 0; col < gridDimension; ++col) {
+		QVector<int> rowSegments;
+		
+		for ( int row = 0; row < inputGridOffset; ++row) {
+			int temp = static_cast<QLineEdit*>(horInputCell->itemAtPosition(col, row)->widget())->text().toInt();
+
+			if ( temp != 0 )
+				rowSegments.append(temp);
+		}
+		segmentInputs.append(rowSegments);
+	}
+	
+	for (int row = 0; row < gridDimension; ++row) {
+		QVector<int> colSegments;
+
+		for (int col = 0; col < inputGridOffset; ++col) {
+			int temp = static_cast<QLineEdit*>(vertInputCell->itemAtPosition(col, row)->widget())->text().toInt();
+	
+			if ( temp != 0 ) 
+				colSegments.append(temp);
+		}
+		segmentInputs.append(colSegments);
+	}
+
 	std::cout<<"solve entered."<<std::endl;
-	Grid solutionBoard(gridDimension, inputGridOffset, picmaGrid);
+	Grid solutionBoard(gridDimension, segmentInputs);
 	std::cout<<"Board Made."<<std::endl;
 	solutionBoard.solve();
 	std::cout<<"Solve passed."<<std::endl;
@@ -118,10 +139,10 @@ void GridUI::updateGrid(Grid& newGrid) {
 				case OPEN:
 					break;
 				case FILLED:
-					puzzleGridCell->itemAtPosition(puzzCol, puzzRow)->widget()->setStyleSheet("QLineEdit { background-color: blue }");
+					puzzleGridCell->itemAtPosition(puzzRow, puzzCol)->widget()->setStyleSheet("QLineEdit { background-color: blue }");
 					break;
 				case CLOSED:
-					puzzleGridCell->itemAtPosition(puzzCol, puzzRow)->widget()->setStyleSheet("QLineEdit { background-color: red }");
+					puzzleGridCell->itemAtPosition(puzzRow, puzzCol)->widget()->setStyleSheet("QLineEdit { background-color: red }");
 					break;
 			}
 		}
