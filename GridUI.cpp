@@ -2,119 +2,107 @@
 #include <QPushButton>
 #include <QLineEdit>
 #include <QString>
+#include <QLayoutItem>
+#include <QLabel>
 #include "GridUI.h"
 #include "Grid.h"
 #include "PicmaBox.h"
 #include <iostream>
 
-QString* generateTestInput(int x, int y) {
-	if ( y == 0 ) {
-		if ( x == 1 ) {
-			return new QString("13");	
-		} else if ( x == 2 ) {
-			return new QString("3 2");
-		} else if ( x == 3 ) {
-			return new QString("1 5 2");
-		} else if ( x == 4 ) {
-			return new QString("3 1 3 2");
-		} else if ( x == 5 ) {
-			return new QString("3 1 3 1");
-		} else if ( x == 6 ) {
-			return new QString("5 1 2 1");
-		} else if ( x == 7 ) {
-			return new QString("1 5 1 1");
-		} else if ( x == 8 ) {
-			return new QString("1 1 1 1 1 1");
-		} else if ( x == 9 ) {
-			return new QString("1 3 1 1 1 1");
-		} else if ( x == 10 ) {
-			return new QString("1 5 1 2 1");
-		} else if ( x == 11 ) {
-			return new QString("3 1 3 1");
-		} else if ( x == 12 ) {
-			return new QString("3 1 3 2");
-		} else if ( x == 13 ) {
-			return new QString("1 5 2");
-		} else if ( x == 14 ) {
-			return new QString("3 3");
-		} else if ( x == 15 ) {
-			return new QString("11 1");
-		}	
-	} else if ( x == 0 ) {
-		if ( y == 1 ) {
-			return new QString("3 1 3");	
-		} else if ( y == 2 ) {
-			return new QString("2 1 1 2");
-		} else if ( y == 3 ) {
-			return new QString("2 9 2");
-		} else if ( y == 4 ) {
-			return new QString("1 3 3 1");
-		} else if ( y == 5 ) {
-			return new QString("1 2 2 2 2 1");
-		} else if ( y == 6 ) {
-			return new QString("1 1 7 1 1");
-		} else if ( y == 7 ) {
-			return new QString("1 2 2 2 2 1");
-		} else if ( y == 8 ) {
-			return new QString("1 1 1 1 1");
-		} else if ( y == 9 ) {
-			return new QString("1 2 3 2 1");
-		} else if ( y == 10 ) {
-			return new QString("1 3 3 1");
-		} else if ( y == 11 ) {
-			return new QString("2 2 3 2 2");
-		} else if ( y == 12 ) {
-			return new QString("3 2 2 1");
-		} else if ( y == 13 ) {
-			return new QString("1 2 5 2");
-		} else if ( y == 14 ) {
-			return new QString("2 3");
-		} else if ( y == 15 ) {
-			return new QString("1 3 1 1");
-		}
-	} else {
-		return new QString(" ");
-	}
-}
 
 GridUI::GridUI(QWidget* parent) : QWidget(parent) {
 
-	QGridLayout *grid = new QGridLayout(this);
-
+	grid = new QGridLayout(this);
 	grid->setSpacing(2);
+
+	uiCell = new QGridLayout();
+	vertInputCell = new QGridLayout();
+	horInputCell = new QGridLayout();
+	puzzleGridCell = new QGridLayout();
+	
+	grid->addItem(uiCell, UI_COL, UI_ROW);
+	grid->addItem(vertInputCell, VERT_IN_COL, VERT_IN_ROW);
+	grid->addItem(horInputCell, HOR_IN_COL, HOR_IN_ROW);
+	grid->addItem(puzzleGridCell, PUZZ_GRID_COL, PUZZ_GRID_ROW); 
+
+	inputGridOffset = (gridDimension / 2) + gridDimension % 2;
+
 	QPushButton *solveButton = new QPushButton("solve", this);
 	solveButton->setFixedSize(60, 20);
-	grid->addWidget(solveButton, 0, 0);
-	
-	for (int i = 0; i < 16; ++i) {
-		QVector<QLineEdit*> gridRow;
-		for (int j = 0; j < 16; ++j) {
-			if ( i == 0 && j == 0 ) {
-				gridRow.append(NULL);
-				continue;
-			}
-			if ( i != 0 && j != 0 ) {
-				gridRow.append(new QLineEdit(this));
-				gridRow[j]->setReadOnly(true);
-				gridRow[j]->setFixedWidth(20);
-			} else {
-				QString *defaultText = generateTestInput(i, j);
-				gridRow.append(new QLineEdit(*defaultText, this));
-				gridRow[j]->setFixedWidth(60);
-			}
-			grid->addWidget(gridRow[j], j, i);	
-		}
-		picmaGrid.append(gridRow);
-	}
-	
+	uiCell->addWidget(solveButton, 1, 0);
+
+	dimensionInput = new QLineEdit(QString("%1").arg(gridDimension), this);
+	dimensionInput->setFixedWidth(25);
+	QLabel *dimensionInputTitle = new QLabel("Puzzle Dimension:", this);
+	uiCell->addWidget(dimensionInputTitle, 0, 0);
+	uiCell->addWidget(dimensionInput, 0, 1);
+
+	buildGrid();
+
 	setLayout(grid);
 
 	connect(solveButton, &QPushButton::clicked, this, &GridUI::solve);
+	connect(dimensionInput, &QLineEdit::returnPressed, this, &GridUI::buildGrid);
+}
+
+void GridUI::buildGrid() {
+	gridDimension = dimensionInput->text().toInt();
+	inputGridOffset = (gridDimension / 2) + gridDimension % 2;
+
+
+	QLayoutItem *toDelete;
+	while ((toDelete = vertInputCell->takeAt(0)) != 0) {
+		vertInputCell->removeItem(toDelete);
+		delete toDelete->widget();
+	}
+	while ((toDelete = horInputCell->takeAt(0)) != 0) {
+		horInputCell->removeItem(toDelete);
+		delete toDelete->widget();
+	}
+	while ((toDelete = puzzleGridCell->takeAt(0)) != 0) {
+		puzzleGridCell->removeItem(toDelete);
+		delete toDelete->widget();
+	}
+
+	horInputCell->invalidate();
+	vertInputCell->invalidate();
+	puzzleGridCell->invalidate();
+	grid->invalidate();
+
+	for (int inCol = 0; inCol < gridDimension; ++inCol) {
+		for (int inBox = 0; inBox < inputGridOffset; ++inBox) {
+			QLineEdit *temp = new QLineEdit("", this);
+			temp->setFixedWidth(20);
+			horInputCell->addWidget(temp, inCol, inBox);
+			temp->show();
+		}
+		
+	}
+	
+	for (int inRow = 0; inRow < gridDimension; ++inRow) {
+		for (int inBox = 0; inBox < inputGridOffset; ++inBox) {
+			QLineEdit *temp = new QLineEdit(" ", this);
+			temp->setFixedWidth(20);
+			vertInputCell->addWidget(temp, inBox, inRow);
+			temp->show();
+		}
+	}
+	
+	for (int puzzCol = 0; puzzCol < gridDimension; ++puzzCol) {
+		for (int puzzRow = 0; puzzRow < gridDimension; ++puzzRow) {
+			QLineEdit *puzzBox = new QLineEdit("", this);
+			puzzBox->setReadOnly(true);
+			puzzBox->setFixedWidth(20);
+			puzzleGridCell->addWidget(puzzBox, puzzCol, puzzRow);
+			puzzBox->show();
+		}
+	}
+	return;
 }
 
 bool GridUI::solve() {
 	std::cout<<"solve entered."<<std::endl;
-	Grid solutionBoard(16, picmaGrid);
+	Grid solutionBoard(gridDimension, inputGridOffset, picmaGrid);
 	std::cout<<"Board Made."<<std::endl;
 	solutionBoard.solve();
 	std::cout<<"Solve passed."<<std::endl;
@@ -124,17 +112,16 @@ bool GridUI::solve() {
 }
 
 void GridUI::updateGrid(Grid& newGrid) {
-	for (int i = 0; i < 15; ++i) {
-		for (int j = 0; j < 15; ++j) {
-			QString *boxState;
-			switch (newGrid.boxStateAt(i,j)) {
+	for (int puzzCol = 0; puzzCol < gridDimension; ++puzzCol) {
+		for (int puzzRow = 0; puzzRow < gridDimension; ++puzzRow) {
+			switch (newGrid.boxStateAt(puzzCol,puzzRow)) {
 				case OPEN:
 					break;
 				case FILLED:
-					picmaGrid[i+1][j+1]->setStyleSheet("QLineEdit { background-color: blue }");
+					puzzleGridCell->itemAtPosition(puzzCol, puzzRow)->widget()->setStyleSheet("QLineEdit { background-color: blue }");
 					break;
 				case CLOSED:
-					picmaGrid[i+1][j+1]->setStyleSheet("QLineEdit { background-color: red }");
+					puzzleGridCell->itemAtPosition(puzzCol, puzzRow)->widget()->setStyleSheet("QLineEdit { background-color: red }");
 					break;
 			}
 		}

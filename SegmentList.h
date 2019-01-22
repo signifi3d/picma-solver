@@ -8,7 +8,7 @@
 class SegmentList {
 	public:
 		SegmentList();
-		SegmentList(int,int, int, QString);
+		SegmentList(int,int, int, QVector<int>);
 		void printSegments();
 		int getRow();
 		int getColumn();

@@ -9,23 +9,20 @@ SegmentList::SegmentList() {
 	size = 0;
 }
 
-SegmentList::SegmentList(int x, int y, int inSize, QString inputString) {
+SegmentList::SegmentList(int x, int y, int inSize, QVector<int> inputVector) {
 	row = x;
 	column = y;
 	size = inSize;
-	if (inputString.size() > 0) {
-		QStringList splitInput = inputString.split(' ');
-		for (int i = 0; i < splitInput.size(); ++i) {
-			int prevSegmentSize = 0;
-			int nextSegmentSize = 0;
-			for (int j = 0; j < i; ++j) {
-				prevSegmentSize += splitInput[j].toInt()+1;
-			}
-			for (int j = i + 1; j < splitInput.size(); ++j) {
-				nextSegmentSize += splitInput[j].toInt()+1;
-			}
-			line.append(Segment(splitInput[i].toInt(), size, prevSegmentSize, nextSegmentSize));
+	for (int i = 0; i < inputVector.size(); ++i) {
+		int prevSegmentSize = 0;
+		int nextSegmentSize = 0;
+		for (int j = 0; j < i; ++j) {
+			prevSegmentSize += inputVector[j]+1;
 		}
+		for (int j = i + 1; j < inputVector.size(); ++j) {
+			nextSegmentSize += inputVector[j]+1;
+		}
+		line.append(Segment(inputVector[i], size, prevSegmentSize, nextSegmentSize));
 	}
 }
 

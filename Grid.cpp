@@ -10,14 +10,25 @@
 //debug
 #include <iostream>
 
-Grid::Grid(int size, QVector<QVector<QLineEdit*>> &inputGrid) {
-	board = new QVector<QVector<PicmaBox>>(size-1, QVector<PicmaBox>(size, PicmaBox()));
-	for (int i = 1; i < size; i++) {
-		lineSegments.insert(QPair<int,int>(0,i), SegmentList(i-1, 0, size-1, inputGrid[0][i]->text()));
+Grid::Grid(int size, int inputGridOffset, QVector<QVector<QLineEdit*>> &inputGrid) {
+	board = new QVector<QVector<PicmaBox>>(size, QVector<PicmaBox>(size, PicmaBox()));
+	for (int i = 1; i <= size; i++) {
+		QVector<int> segmentVector;
+		for (int j = 0; j < inputGridOffset; ++j) {
+			if (inputGrid[j][inputGridOffset+(i-1)]->text().toInt())
+				segmentVector.append(inputGrid[j][inputGridOffset+(i-1)]->text().toInt());
+		}
+		lineSegments.insert(QPair<int,int>(0,i), SegmentList(i-1, 0, size, segmentVector));
 	}
-	for (int i = 1; i < size; i++) {
-		lineSegments.insert(QPair<int,int>(i,0), SegmentList(0, i-1, size-1, inputGrid[i][0]->text()));
+	for (int i = 1; i <= size; i++) {
+		QVector<int> segmentVector;
+		for (int j = 0; j < inputGridOffset; ++j) {
+			if (inputGrid[inputGridOffset+(i-1)][j]->text().toInt())
+				segmentVector.append(inputGrid[inputGridOffset+(i-1)][j]->text().toInt());
+		}
+		lineSegments.insert(QPair<int,int>(i,0), SegmentList(0, i-1, size, segmentVector));
 	}
+	std::cout << board->size() << std::endl;
 } 
 
 boxState Grid::boxStateAt(int x, int y) {
@@ -169,7 +180,7 @@ void Grid::fillClosedBoxes() {
 	for (int x = 0; x < board->size(); ++x) {
 		SegmentList columnSegments = lineSegments[QPair<int,int>(x+1,0)];
 		for (int segNo = 0; segNo < columnSegments.numOfSegments(); ++segNo) {
-			if ( columnSegments.getSegment(segNo).isComplete() ) {
+			if ( columnSegments.getSegment(segNo).isComplete() && columnSegments.getSegment(segNo).getSize() != board->size()) {
 				if ( segNo == 0 ) {
 					for (int lineSpace = 0; lineSpace < columnSegments.getSegment(segNo).getLowestPossibleBound(); ++lineSpace) {
 						setStateAt(x,lineSpace,CLOSED);
@@ -197,7 +208,7 @@ void Grid::fillClosedBoxes() {
 	for (int y = 0; y < board->size(); ++y) {
 		SegmentList rowSegments = lineSegments[QPair<int,int>(0,y+1)];
 		for (int segNo = 0; segNo < rowSegments.numOfSegments(); ++segNo) {
-			if ( rowSegments.getSegment(segNo).isComplete() ) {
+			if ( rowSegments.getSegment(segNo).isComplete() && rowSegments.getSegment(segNo).getSize() != board->size()) {
 				if ( segNo == 0 ) {
 					for (int lineSpace = 0; lineSpace < rowSegments.getSegment(segNo).getLowestPossibleBound(); ++lineSpace) {
 						setStateAt(lineSpace,y,CLOSED);
