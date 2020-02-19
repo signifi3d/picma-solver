@@ -1,1 +1,1 @@
-An app for solving picma puzzles by Blake Eakin.
+Solves various sizes of picture enigma or picma puzzles in one color. Solves all but the most difficult of puzzles, but it'll still try its darndest and gives you somewhere to start finishing solving it. I kind of lost interest in these puzzles myself so this project has kind of fallen to the wayside.
