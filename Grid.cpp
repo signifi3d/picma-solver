@@ -121,45 +121,10 @@ void Grid::checkInevitableCompletions() {
 }
 
 void Grid::checkForCompleteSegments() {
-	for (int x = 0; x < board->size(); ++x) {
-		LineState currentLineState;
-		Span filledBoxSpan(-1,-1);
-		for (int y = 0; y < board->size(); ++y) {
-			if ( boxStateAt(x,y) == FILLED && filledBoxSpan.getLowerBound() == -1 ) {
-				filledBoxSpan.setLowerBound(y);
-			}
-			if ( (boxStateAt(x,y) != FILLED || y == board->size()-1) && filledBoxSpan.getLowerBound() != -1 ) {
-				filledBoxSpan.setUpperBound(boxStateAt(x,y)!=FILLED?y-1:y);
-				currentLineState.addSpan(filledBoxSpan);
-				filledBoxSpan.setLowerBound(-1);
-				filledBoxSpan.setUpperBound(-1);
-			}
-		}
-		/* DEBUG 
-		std::cout << "0, " << x << " state: ";
-		for (int i = 0; i < currentLineState.numOfSpans(); ++i) {
-			std::cout << "Range " << i+1 << " " << currentLineState.getBoxSpanNum(i).getLowerBound() << "-" << currentLineState.getBoxSpanNum(i).getUpperBound() << " ";
-		}
-		std::cout << std::endl;
-		 */
-		lineSegments[QPair<int,int>(x+1,0)].compareWithLineState(currentLineState);
-	}
-	for (int y = 0; y < board->size(); ++y) {
-		LineState currentLineState;
-		Span filledBoxSpan(-1,-1);
-		for (int x = 0; x < board->size(); ++x) {
-			if ( boxStateAt(x,y) == FILLED && filledBoxSpan.getLowerBound() == -1) {
-				filledBoxSpan.setLowerBound(x);
-			}
-			if ((boxStateAt(x,y) != FILLED || x == board->size()-1 ) && filledBoxSpan.getLowerBound() != -1 ) {
-				filledBoxSpan.setUpperBound(boxStateAt(x,y)!=FILLED ? x-1 : x);
-				currentLineState.addSpan(filledBoxSpan);
-				filledBoxSpan.setLowerBound(-1);
-				filledBoxSpan.setUpperBound(-1);
-			}
-		}
-		lineSegments[QPair<int,int>(0,y+1)].compareWithLineState(currentLineState);
-	}
+	for (int x = 0; x < board->size(); ++x) 
+		lineSegments[QPair<int,int>(x+1,0)].compareWithLineState(getVerticalLineState(x));
+	for (int y = 0; y < board->size(); ++y) 
+		lineSegments[QPair<int,int>(0,y+1)].compareWithLineState(getHorizontalLineState(y));
 }
 
 void Grid::fillClosedBoxes() {
@@ -229,6 +194,68 @@ void Grid::fillClosedBoxes() {
 			}
 		}
 	}
+	//Check horizontal and vertical line states, look for largest spans that aren't complete, if those spans are the largest unfound spans then close sides
+	for (int x = 0; x < board->size(); ++x) {
+		QVector<Span> largestIncompleteSpans;
+		LineState currState = getVerticalLineState(x);
+
+		for (int i = 0; i < currState.numOfSpans(); ++i) {
+			if ( !lineSegments[QPair<int,int>(x+1, 0)].spanIsComplete( currState.getBoxSpanNum(i) ) ) {
+				if ( largestIncompleteSpans.size() == 0 ) {
+					largestIncompleteSpans.append(currState.getBoxSpanNum(i));
+				} else {
+					if ( currState.getBoxSpanNum(i).range() > largestIncompleteSpans[0].range() ) {
+						largestIncompleteSpans.clear();
+						largestIncompleteSpans.append(currState.getBoxSpanNum(i));
+					} else if ( currState.getBoxSpanNum(i).range() == largestIncompleteSpans[0].range() ) {
+						largestIncompleteSpans.append(currState.getBoxSpanNum(i));
+					}
+				}
+			}
+		}
+		if ( largestIncompleteSpans.size() > 0 ) {
+			if ( lineSegments[QPair<int,int>(x+1,0)].numOfLargestNonCompleteSegments( largestIncompleteSpans[0].range()+1 ) > 0 ) {
+				for (int i = 0; i < largestIncompleteSpans.size(); ++i) {
+					if ( largestIncompleteSpans[i].getLowerBound() != 0 ) 
+						setStateAt(x, largestIncompleteSpans[i].getLowerBound()-1, CLOSED);
+					if ( largestIncompleteSpans[i].getUpperBound() != board->size()-1 )
+						setStateAt(x, largestIncompleteSpans[i].getUpperBound()+1, CLOSED);	
+				}
+			}
+		}
+		
+	}
+	for (int y = 0; y < board->size(); ++y) {
+		QVector<Span> largestIncompleteSpans;
+		LineState currState = getHorizontalLineState(y);
+
+		for (int i = 0; i < currState.numOfSpans(); ++i) {
+			if ( !lineSegments[QPair<int,int>(0, y+1)].spanIsComplete( currState.getBoxSpanNum(i) ) ) {
+				if ( largestIncompleteSpans.size() == 0 ) {
+					largestIncompleteSpans.append(currState.getBoxSpanNum(i));
+				} else {
+					if ( currState.getBoxSpanNum(i).range() > largestIncompleteSpans[0].range() ) {
+						largestIncompleteSpans.clear();
+						largestIncompleteSpans.append(currState.getBoxSpanNum(i));
+					} else if ( currState.getBoxSpanNum(i).range() == largestIncompleteSpans[0].range() ) {
+						largestIncompleteSpans.append(currState.getBoxSpanNum(i));
+					}
+				}
+			}
+		}
+
+		if ( largestIncompleteSpans.size() > 0 ) {
+			if ( lineSegments[QPair<int,int>(0,y+1)].numOfLargestNonCompleteSegments( largestIncompleteSpans[0].range()+1 ) > 0 ) {
+				for (int i = 0; i < largestIncompleteSpans.size(); ++i) {
+					if ( largestIncompleteSpans[i].getLowerBound() != 0 ) 
+						setStateAt(largestIncompleteSpans[i].getLowerBound()-1, y, CLOSED);
+					if ( largestIncompleteSpans[i].getUpperBound() != board->size()-1 )
+						setStateAt(largestIncompleteSpans[i].getUpperBound()+1, y, CLOSED);	
+				}
+			}
+		}
+		
+	}
 }
 
 void Grid::checkPossibleSpanIntersections() {
@@ -255,6 +282,45 @@ bool Grid::puzzleSolved() {
 		}
 	}
 	return true;
+}
+
+LineState Grid::getVerticalLineState(int colNum) {
+	LineState currLineState;
+	Span filledBoxSpan(-1,-1);
+
+	for (int y = 0; y < board->size(); ++y) {
+		if ( boxStateAt(colNum,y) == FILLED && filledBoxSpan.getLowerBound() == -1 ) {
+			filledBoxSpan.setLowerBound(y);
+		}
+		if ( (boxStateAt(colNum,y) != FILLED || y == board->size()-1) && filledBoxSpan.getLowerBound() != -1 ) {
+			filledBoxSpan.setUpperBound(boxStateAt(colNum,y)!=FILLED?y-1:y);
+			currLineState.addSpan(filledBoxSpan);
+			filledBoxSpan.setLowerBound(-1);
+			filledBoxSpan.setUpperBound(-1);
+		}
+	}
+
+	return currLineState;
+
+}
+
+LineState Grid::getHorizontalLineState(int rowNum) {
+	LineState currLineState;
+	Span filledBoxSpan(-1,-1);
+
+	for (int x = 0; x < board->size(); ++x) {
+		if ( boxStateAt(x, rowNum) == FILLED && filledBoxSpan.getLowerBound() == -1 ) {
+			filledBoxSpan.setLowerBound(x);
+		}
+		if ( (boxStateAt(x, rowNum) != FILLED || x == board->size()-1) && filledBoxSpan.getLowerBound() != -1 ) {
+			filledBoxSpan.setUpperBound(boxStateAt(x,rowNum)!=FILLED?x-1:x);
+			currLineState.addSpan(filledBoxSpan);
+			filledBoxSpan.setLowerBound(-1);
+			filledBoxSpan.setUpperBound(-1);
+		}
+	}
+
+	return currLineState;
 }
 
 void Grid::debugBoardPrint() {

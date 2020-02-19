@@ -23,6 +23,9 @@ class Grid {
 		void checkInevitableCompletions();
 		void pairLooseFilledBoxes();
 		bool puzzleSolved();
+
+		LineState getVerticalLineState(int);
+		LineState getHorizontalLineState(int);
 		
 		void debugBoardPrint();
 };

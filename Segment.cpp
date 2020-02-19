@@ -101,3 +101,13 @@ bool Segment::noPossibleSpansContain(int position) {
 		if ( possibleSpans[i].spanContains(position) ) return false;
 	return true;
 }
+
+bool Segment::containsSpan(Span testSpan) {
+	if ( testSpan.range()+1 != size ) 
+		return false;
+	for (int i = 0; i < possibleSpans.size(); ++i) {
+		if ( possibleSpans[i].getLowerBound() == testSpan.getLowerBound() && possibleSpans[i].getUpperBound() == testSpan.getUpperBound() )
+			return true;	
+	}
+	return false;
+}

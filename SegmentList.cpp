@@ -59,8 +59,19 @@ void SegmentList::setSegmentAsComplete(int segNo, Span completionSpan) {
 		if ( i == segNo ) 
 			line[i].setComplete(completionSpan);
 		else {
-			for (int j = completionSpan.getLowerBound(); j <= completionSpan.getUpperBound(); ++j)
-				line[i].removePossibleSpansWith(j);
+			int lowerBound, upperBound;
+			if ( i < segNo ) {
+				lowerBound = completionSpan.getLowerBound();
+				upperBound = size-1;
+			} else if ( i > segNo ) {
+				lowerBound = 0;
+				upperBound = completionSpan.getUpperBound();
+			} else {
+				lowerBound = completionSpan.getLowerBound();
+				upperBound = completionSpan.getUpperBound();
+			}
+			for (; lowerBound <= upperBound; ++lowerBound)
+				line[i].removePossibleSpansWith(lowerBound);
 		}
 	}
 }
@@ -96,7 +107,7 @@ void SegmentList::compareWithLineState(LineState currentState) {
 						break;
 					}
 				}
-				if ( isLargestUniqueSegment(i) ) {
+				if ( numOfLargestNonCompleteSegments(line[i].getSize()) == 1 ) {
 					setSegmentAsComplete(i, currentState.getBoxSpanNum(j));
 					latestPairedState = j;
 					break;
@@ -122,10 +133,28 @@ void SegmentList::seekSolePositionOwnership(int position) {
 	line[positionOwnerIndex].removePossibleSpansWithout(position);
 }
 
-bool SegmentList::isLargestUniqueSegment(int segmentIndex) {
-	if ( size - line[segmentIndex].getSize() < size / 2 ) return true;
+bool SegmentList::spanIsComplete(Span testSpan) {
+
 	for (int i = 0; i < line.size(); ++i) {
-		if (!line[i].isComplete() && (line[i].getSize() > line[segmentIndex].getSize() || (line[i].getSize() == line[segmentIndex].getSize() && i != segmentIndex)) ) return false;
+		if ( line[i].isComplete() && line[i].containsSpan(testSpan) )
+			return true;
 	}
-	return true;
+	
+	return false;
+}
+
+/* returns count of largest segments in the line if segment size
+   provided is the largest non-complete segment. Returns 0 
+   otherwise.
+*/
+int SegmentList::numOfLargestNonCompleteSegments(int segmentSize) {
+	int count = 0;
+
+	for (int i = 0; i < line.size(); ++i) {
+		if (!line[i].isComplete() && line[i].getSize() > segmentSize ) 
+			return 0;
+		else if ( !line[i].isComplete() && line[i].getSize() == segmentSize )
+			++count;
+	}
+	return count;
 }

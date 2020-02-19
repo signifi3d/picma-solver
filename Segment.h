@@ -10,6 +10,7 @@ class Segment {
 		Segment(int,int,int,int);
 		int getSize();
 		bool allPossibleSpansIntersectAt(int);
+		bool containsSpan(Span);
 		bool noPossibleSpansContain(int);
 		void removePossibleSpansWithout(int);
 		void removePossibleSpansWith(int);
